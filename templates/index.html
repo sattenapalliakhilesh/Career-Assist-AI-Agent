@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Job Agent</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #111; padding: 40px 20px; }
+    .container { max-width: 960px; margin: 0 auto; }
+    .header { margin-bottom: 28px; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 20px; background: #e8f0fe; color: #3b5bdb; margin-bottom: 12px; }
+    .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    .header p { color: #666; font-size: 15px; margin-top: 6px; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #e2e8f0; padding: 4px; border-radius: 10px; width: fit-content; }
+    .tab { padding: 9px 20px; border-radius: 7px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #666; transition: all 0.15s; }
+    .tab.active { background: #fff; color: #111; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    label { font-size: 13px; font-weight: 600; color: #333; display: block; margin-bottom: 7px; }
+    textarea { width: 100%; height: 140px; padding: 12px 14px; font-size: 14px; border: 1px solid #dde3ed; border-radius: 8px; resize: vertical; color: #111; background: #fafbfc; outline: none; line-height: 1.65; transition: border-color 0.15s; }
+    textarea:focus { border-color: #3b5bdb; background: #fff; }
+    textarea::placeholder { color: #aaa; }
+    .criteria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    input[type="text"] { width: 100%; padding: 11px 14px; font-size: 14px; border: 1px solid #dde3ed; border-radius: 8px; background: #fafbfc; color: #111; outline: none; transition: border-color 0.15s; }
+    input[type="text"]:focus { border-color: #3b5bdb; background: #fff; }
+    input[type="text"]::placeholder { color: #aaa; }
+    select { width: 100%; padding: 11px 14px; font-size: 14px; border: 1px solid #dde3ed; border-radius: 8px; background: #fafbfc; color: #111; outline: none; cursor: pointer; }
+    .btn { margin-top: 4px; width: 100%; padding: 13px; font-size: 15px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; background: #3b5bdb; color: #fff; transition: background 0.15s; }
+    .btn:hover { background: #2f4ac4; }
+    .btn:disabled { background: #a0aec0; cursor: not-allowed; }
+    .btn-secondary { margin-top: 10px; width: 100%; padding: 10px; font-size: 13px; font-weight: 500; border: 1px solid #dde3ed; border-radius: 10px; cursor: pointer; background: #fff; color: #666; transition: all 0.15s; }
+    .btn-secondary:hover { border-color: #3b5bdb; color: #3b5bdb; }
+    .spinner { display: none; text-align: center; padding: 12px 0 0; font-size: 13px; color: #888; }
+    .agent-log { background: #0f1117; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+    .agent-log .log-title { color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block; }
+    .agent-log p { font-size: 12px; color: #4ade80; font-family: monospace; margin: 3px 0; }
+    .job-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+    .job-header { padding: 16px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .job-title { font-size: 15px; font-weight: 600; color: #111; margin-bottom: 3px; }
+    .job-meta { font-size: 13px; color: #666; }
+    .job-meta span { margin-right: 12px; }
+    .score-badge { font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+    .score-high { background: #f0fdf4; color: #16a34a; }
+    .score-mid { background: #fffbeb; color: #d97706; }
+    .score-low { background: #fff5f5; color: #dc2626; }
+    .job-body { padding: 16px 20px; }
+    .job-summary { font-size: 13px; color: #555; line-height: 1.65; margin-bottom: 14px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+    .tag-blue { background: #e8f0fe; color: #3b5bdb; }
+    .tag-red { background: #fff5f5; color: #dc2626; }
+    .tag-green { background: #f0fdf4; color: #16a34a; }
+    .job-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .action-btn { padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: 7px; cursor: pointer; transition: all 0.15s; border: 1px solid #dde3ed; background: #f1f3f9; color: #3b5bdb; }
+    .action-btn:hover { background: #e8f0fe; }
+    .action-btn.primary { background: #3b5bdb; color: #fff; border-color: #3b5bdb; }
+    .action-btn.primary:hover { background: #2f4ac4; }
+    .resume-drawer { display: none; background: #fafbfc; border-top: 1px solid #e2e8f0; padding: 20px; }
+    .resume-drawer.open { display: block; }
+    .drawer-tabs { display: flex; gap: 4px; margin-bottom: 14px; }
+    .drawer-tab { padding: 7px 14px; font-size: 13px; font-weight: 500; border-radius: 6px; cursor: pointer; border: 1px solid #dde3ed; background: #fff; color: #666; }
+    .drawer-tab.active { background: #3b5bdb; color: #fff; border-color: #3b5bdb; }
+    .resume-box { font-size: 13px; line-height: 1.85; white-space: pre-wrap; color: #222; max-height: 350px; overflow-y: auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+    .copy-btn { padding: 7px 16px; background: #f1f3f9; color: #3b5bdb; border: 1px solid #dde3ed; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; }
+    .copy-btn:hover { background: #e8f0fe; }
+    .search-summary { font-size: 13px; color: #666; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; }
+    .error { background: #fff5f5; border: 1px solid #fcc; color: #c53030; padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; }
+    .divider { border: none; border-top: 1px solid #edf0f7; margin: 16px 0; }
+    .section-title { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+    .scheduler-info { font-size: 13px; color: #666; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="badge">AI Agent</div>
+      <h1>Job Application Agent</h1>
+      <p>Find jobs and get a tailored resume and cover letter for each — automatically.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('find')">Find jobs for me</button>
+      <button class="tab" onclick="switchTab('tailor')">Tailor for a specific job</button>
+    </div>
+
+    <div id="tab-find" class="tab-content active">
+      <div class="card">
+        <div class="criteria-grid">
+          <div>
+            <label>Job title / role</label>
+            <input type="text" id="role" placeholder="e.g. AI Product Manager, AI Engineer">
+          </div>
+          <div>
+            <label>Location</label>
+            <input type="text" id="location" placeholder="e.g. Vancouver, Remote, Canada">
+          </div>
+          <div>
+            <label>Experience level</label>
+            <select id="experience">
+              <option value="mid-level">Mid-level (3–5 years)</option>
+              <option value="senior">Senior (5+ years)</option>
+              <option value="junior">Junior (0–3 years)</option>
+              <option value="any">Any level</option>
+            </select>
+          </div>
+          <div>
+            <label>Salary expectation</label>
+            <input type="text" id="salary" placeholder="e.g. $120k+, $100k–$150k">
+          </div>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label>Any other preferences</label>
+          <textarea id="preferences" placeholder="e.g. startup environment, fintech, must have equity..." style="height: 80px;"></textarea>
+        </div>
+        <button class="btn" id="find-btn" onclick="findJobs()">Find matching jobs & tailor resumes</button>
+        <button class="btn-secondary" onclick="triggerNow()">Run now and email me results</button>
+        <div class="scheduler-info">Scheduler is active — job search runs automatically every day at 8:00 AM and emails you the results.</div>
+        <div class="spinner" id="find-spinner">Agent is searching the web for jobs and tailoring your resume for each... this takes 1–2 minutes</div>
+      </div>
+
+      <div id="find-error" class="error" style="display:none;"></div>
+      <div id="find-results" style="display:none;">
+        <div class="agent-log" id="find-log"><span class="log-title">Agent search log</span></div>
+        <div class="search-summary" id="search-summary"></div>
+        <div id="jobs-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-tailor" class="tab-content">
+      <div class="card">
+        <label>Job description or URL</label>
+        <textarea id="job-input" placeholder="Paste the full job description here, or paste a job posting URL..."></textarea>
+        <button class="btn" id="analyze-btn" onclick="analyzeJob()">Analyze & tailor resume</button>
+        <div class="spinner" id="analyze-spinner">Agent is researching the company and tailoring your resume... 30–60 seconds</div>
+      </div>
+      <div id="analyze-error" class="error" style="display:none;"></div>
+      <div id="analyze-results" style="display:none;">
+        <div class="agent-log" id="analyze-log"><span class="log-title">Agent activity log</span></div>
+        <div class="card" id="analyze-card"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'find')));
+      document.getElementById('tab-find').classList.toggle('active', tab === 'find');
+      document.getElementById('tab-tailor').classList.toggle('active', tab === 'tailor');
+    }
+
+    async function findJobs() {
+      const role = document.getElementById('role').value.trim();
+      if (!role) { alert('Please enter a job title or role.'); return; }
+      const criteria = buildCriteria();
+      setFindLoading(true);
+      try {
+        const res = await fetch('/find-jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ criteria })
+        });
+        const data = await res.json();
+        setFindLoading(false);
+        if (data.error) { showFindError(data.error); return; }
+        renderJobs(data);
+      } catch (e) {
+        setFindLoading(false);
+        showFindError('Something went wrong. Please try again.');
+      }
+    }
+
+    async function triggerNow() {
+      const btn = event.target;
+      btn.innerText = 'Running — check your email in ~2 minutes';
+      btn.disabled = true;
+      const res = await fetch('/trigger-now', { method: 'POST' });
+      const data = await res.json();
+      setTimeout(() => { btn.disabled = false; btn.innerText = 'Run now and email me results'; }, 8000);
+    }
+
+    function buildCriteria() {
+      const role = document.getElementById('role').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const experience = document.getElementById('experience').value;
+      const salary = document.getElementById('salary').value.trim();
+      const preferences = document.getElementById('preferences').value.trim();
+      return `Role: ${role}\nLocation: ${location || 'Open to remote'}\nExperience: ${experience}\nSalary: ${salary || 'Not specified'}\nPreferences: ${preferences || 'None'}`;
+    }
+
+    function setFindLoading(loading) {
+      document.getElementById('find-btn').disabled = loading;
+      document.getElementById('find-btn').innerText = loading ? 'Searching...' : 'Find matching jobs & tailor resumes';
+      document.getElementById('find-spinner').style.display = loading ? 'block' : 'none';
+      if (loading) {
+        document.getElementById('find-results').style.display = 'none';
+        document.getElementById('find-error').style.display = 'none';
+      }
+    }
+
+    function showFindError(msg) {
+      document.getElementById('find-error').innerText = msg;
+      document.getElementById('find-error').style.display = 'block';
+    }
+
+    function renderJobs(data) {
+      const logEl = document.getElementById('find-log');
+      logEl.innerHTML = '<span class="log-title">Agent search log</span>';
+      (data.agent_log || []).forEach(log => {
+        const p = document.createElement('p');
+        p.innerText = '> ' + log;
+        logEl.appendChild(p);
+      });
+
+      document.getElementById('search-summary').innerText = data.search_summary || '';
+      const jobsList = document.getElementById('jobs-list');
+      jobsList.innerHTML = '';
+
+      (data.jobs || []).forEach((job, index) => {
+        const scoreClass = job.match_score >= 70 ? 'score-high' : job.match_score >= 50 ? 'score-mid' : 'score-low';
+        const card = document.createElement('div');
+        card.className = 'job-card';
+        card.innerHTML = `
+          <div class="job-header">
+            <div>
+              <div class="job-title">${job.title || ''}</div>
+              <div class="job-meta">
+                <span>${job.company || ''}</span>
+                <span>${job.location || ''}</span>
+                ${job.salary ? `<span>${job.salary}</span>` : ''}
+              </div>
+            </div>
+            <span class="score-badge ${scoreClass}">${job.match_score}% match</span>
+          </div>
+          <div class="job-body">
+            <p class="job-summary">${job.match_summary || ''}</p>
+            <p class="section-title">Key requirements</p>
+            <div class="tags">${(job.key_requirements||[]).map(r=>`<span class="tag tag-blue">${r}</span>`).join('')}</div>
+            ${job.missing_skills?.length ? `<p class="section-title" style="margin-top:10px">Skills to develop</p><div class="tags">${job.missing_skills.map(s=>`<span class="tag tag-red">${s}</span>`).join('')}</div>` : ''}
+            <div class="job-actions">
+              ${job.url ? `<button class="action-btn primary" onclick="window.open('${job.url}','_blank')">View posting</button>` : ''}
+              <button class="action-btn" onclick="toggleDrawer(${index},'resume')">Tailored resume</button>
+              <button class="action-btn" onclick="toggleDrawer(${index},'cover')">Cover letter</button>
+            </div>
+          </div>
+          <div class="resume-drawer" id="drawer-${index}">
+            <div class="drawer-tabs">
+              <button class="drawer-tab active" id="dtab-resume-${index}" onclick="showDrawerTab(${index},'resume')">Tailored resume</button>
+              <button class="drawer-tab" id="dtab-cover-${index}" onclick="showDrawerTab(${index},'cover')">Cover letter</button>
+            </div>
+            <div id="dcontent-resume-${index}">
+              <div class="resume-box">${job.tailored_resume||''}</div>
+              <button class="copy-btn" onclick="copyBox('dcontent-resume-${index}',this)">Copy resume</button>
+            </div>
+            <div id="dcontent-cover-${index}" style="display:none">
+              <div class="resume-box">${job.cover_letter||''}</div>
+              <button class="copy-btn" onclick="copyBox('dcontent-cover-${index}',this)">Copy cover letter</button>
+            </div>
+          </div>`;
+        jobsList.appendChild(card);
+      });
+
+      document.getElementById('find-results').style.display = 'block';
+      document.getElementById('find-results').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleDrawer(index, type) {
+      const drawer = document.getElementById(`drawer-${index}`);
+      const isOpen = drawer.classList.contains('open');
+      drawer.classList.toggle('open', !isOpen);
+      if (!isOpen) showDrawerTab(index, type);
+    }
+
+    function showDrawerTab(index, type) {
+      document.getElementById(`dcontent-resume-${index}`).style.display = type === 'resume' ? 'block' : 'none';
+      document.getElementById(`dcontent-cover-${index}`).style.display = type === 'cover' ? 'block' : 'none';
+      document.getElementById(`dtab-resume-${index}`).classList.toggle('active', type === 'resume');
+      document.getElementById(`dtab-cover-${index}`).classList.toggle('active', type === 'cover');
+    }
+
+    function copyBox(containerId, btn) {
+      const box = document.querySelector(`#${containerId} .resume-box`);
+      navigator.clipboard.writeText(box.innerText);
+      const original = btn.innerText;
+      btn.innerText = 'Copied!';
+      setTimeout(() => btn.innerText = original, 2000);
+    }
+
+    async function analyzeJob() {
+      const input = document.getElementById('job-input').value.trim();
+      if (!input) return;
+      document.getElementById('analyze-btn').disabled = true;
+      document.getElementById('analyze-btn').innerText = 'Analyzing...';
+      document.getElementById('analyze-spinner').style.display = 'block';
+      document.getElementById('analyze-results').style.display = 'none';
+      document.getElementById('analyze-error').style.display = 'none';
+
+      try {
+        const res = await fetch('/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ job_input: input })
+        });
+        const data = await res.json();
+        document.getElementById('analyze-spinner').style.display = 'none';
+        document.getElementById('analyze-btn').disabled = false;
+        document.getElementById('analyze-btn').innerText = 'Analyze & tailor resume';
+
+        if (data.error) {
+          document.getElementById('analyze-error').innerText = data.error;
+          document.getElementById('analyze-error').style.display = 'block';
+          return;
+        }
+
+        const logEl = document.getElementById('analyze-log');
+        logEl.innerHTML = '<span class="log-title">Agent activity log</span>';
+        (data.agent_log || []).forEach(log => {
+          const p = document.createElement('p'); p.innerText = '> ' + log; logEl.appendChild(p);
+        });
+
+        const scoreClass = data.match_score >= 70 ? 'score-high' : data.match_score >= 50 ? 'score-mid' : 'score-low';
+        document.getElementById('analyze-card').innerHTML = `
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div class="score-badge ${scoreClass}" style="font-size:20px;padding:14px;border-radius:50%;width:66px;height:66px;display:flex;align-items:center;justify-content:center;">${data.match_score}%</div>
+            <div><h3 style="font-size:15px;font-weight:600;margin-bottom:4px;">Match score</h3><p style="font-size:13px;color:#666;line-height:1.6;">${data.match_summary}</p></div>
+          </div>
+          <hr class="divider">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div><p class="section-title">Key requirements</p><div class="tags">${(data.key_requirements||[]).map(r=>`<span class="tag tag-blue">${r}</span>`).join('')}</div></div>
+            <div><p class="section-title">Skills to develop</p><div class="tags">${(data.missing_skills||[]).map(s=>`<span class="tag tag-red">${s}</span>`).join('')}</div></div>
+          </div>
+          <p class="section-title">Keywords added</p>
+          <div class="tags" style="margin-bottom:16px;">${(data.keywords_added||[]).map(k=>`<span class="tag tag-green">${k}</span>`).join('')}</div>
+          <hr class="divider">
+          <p class="section-title">Tailored resume</p>
+          <div class="resume-box" id="tailored-resume">${data.tailored_resume||''}</div>
+          <button class="copy-btn" style="margin-bottom:16px;" onclick="copyEl('tailored-resume',this)">Copy resume</button>
+          <hr class="divider">
+          <p class="section-title">Cover letter</p>
+          <div class="resume-box" id="cover-letter">${data.cover_letter||''}</div>
+          <button class="copy-btn" onclick="copyEl('cover-letter',this)">Copy cover letter</button>`;
+
+        document.getElementById('analyze-results').style.display = 'block';
+        document.getElementById('analyze-results').scrollIntoView({ behavior: 'smooth' });
+
+      } catch (e) {
+        document.getElementById('analyze-spinner').style.display = 'none';
+        document.getElementById('analyze-btn').disabled = false;
+        document.getElementById('analyze-btn').innerText = 'Analyze & tailor resume';
+        document.getElementById('analyze-error').innerText = 'Something went wrong. Please try again.';
+        document.getElementById('analyze-error').style.display = 'block';
+      }
+    }
+
+    function copyEl(id, btn) {
+      navigator.clipboard.writeText(document.getElementById(id).innerText);
+      const original = btn.innerText;
+      btn.innerText = 'Copied!';
+      setTimeout(() => btn.innerText = original, 2000);
+    }
+  </script>
+</body>
+</html>
