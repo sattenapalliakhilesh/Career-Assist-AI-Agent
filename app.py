@@ -306,11 +306,26 @@ COVER LETTER
 def run_daily_job_search():
     print(f"\n[{datetime.now()}] Running scheduled job search...")
     criteria = """
-Role: AI Product Manager, AI Engineer, Technical PM
-Location: Vancouver, Remote Canada, Remote
-Experience: Senior, Mid-level
-Salary: $100k+
-Preferences: Tech companies, startups, AI-focused roles
+Role: Project Manager, Program Manager, Scrum Master
+Job Boards: Search LinkedIn and Indeed only
+
+Location requirements (must match one of these):
+- Remote anywhere in Canada or United States
+- Hybrid ONLY if located in Vancouver, Canada — do not include hybrid roles in other cities
+
+Salary requirements (must match one of these):
+- Minimum $75 per hour
+- OR minimum $180,000 annual salary
+- Do not include jobs below these thresholds
+
+Search strategy:
+- Search LinkedIn: site:linkedin.com/jobs "Project Manager" OR "Program Manager" OR "Scrum Master" remote Canada
+- Search LinkedIn: site:linkedin.com/jobs "Project Manager" OR "Program Manager" OR "Scrum Master" remote United States
+- Search Indeed: site:indeed.com "Project Manager" OR "Program Manager" OR "Scrum Master" remote Canada "$180,000" OR "$75/hour"
+- Search Indeed: site:indeed.com "Program Manager" remote "United States" "$180,000" OR "$75/hour"
+- Search for Vancouver hybrid roles separately on both platforms
+
+Only include jobs that clearly meet the salary AND location requirements.
 """
     try:
         result = find_and_tailor_jobs(criteria)
@@ -321,7 +336,7 @@ Preferences: Tech companies, startups, AI-focused roles
             return
         html = build_email_html(jobs, search_summary)
         attachments = build_attachments(jobs)
-        subject = f"Daily Job Report — {len(jobs)} matches — {datetime.now().strftime('%b %d %Y')}"
+        subject = f"Job Report — {len(jobs)} PM/Scrum roles found — {datetime.now().strftime('%b %d %Y %-I:%M%p')}"
         send_email(subject, html, attachments)
         print(f"Done. Found {len(jobs)} jobs. Email sent.")
     except Exception as e:
@@ -333,7 +348,14 @@ scheduler.add_job(
     trigger="cron",
     hour=8,
     minute=0,
-    id="daily_job_search"
+    id="morning_job_search"
+)
+scheduler.add_job(
+    run_daily_job_search,
+    trigger="cron",
+    hour=13,
+    minute=0,
+    id="afternoon_job_search"
 )
 
 @app.route("/")
