@@ -185,7 +185,7 @@ PRIORITIZATION — sort jobs by how recently they were posted:
 - Yesterday or 1 day ago = high priority
 - 2-3 days ago = medium priority
 - 4-7 days ago = lower priority
-- Over 7 days ago = exclude entirely
+- Over 7 days ago = exclude enittirely
 
 Always return jobs sorted from newest to oldest.
 Include the posting age clearly in posted_date field e.g. "2 hours ago", "1 day ago", "3 days ago".

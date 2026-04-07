@@ -1,0 +1,156 @@
+
+
+Meenakshi Kanneganti
+Senior Program Manager / Agile Scrum Master | Enterprise Systems | PMO Leadership | Multi‑Stream Delivery
+meenakshikanneganti@gmail.com  514-452-0415
+
+PROFESSIONAL SUMMARY
+Technical Program Manager with 10+ years of experience delivering large‑scale, complex technology initiatives across global teams. Proven track record in developing and managing program roadmaps, including scope, timelines, milestones, deliverables, and resource planning across multiple workstreams. Skilled in governance, reporting, risk management, issue management, dependency management, vendor management, budget management, and KPIs. Experienced in system implementation, integration, transition planning, and applying Agile, hybrid, and traditional delivery methodologies. Strong focus on stakeholder engagement, communication, and continuous improvement throughout the program lifecycle.
+Certified Scrum Master with 10+ years of experience leading Agile transformation and delivery at a program level across cross-functional program and product delivery teams. Proven ability to coach teams on Agile principles, facilitate Scrum ceremonies, and drive continuous improvement to ensure consistent sprint delivery and high-quality outcomes. Extensive experience in backlog definition, sprint planning, and aligning delivery with product owner priorities across multiple teams. Skilled in coaching teams on effective effort estimation, story sizing, and adjusting for external dependencies to improve sprint commitments and delivery predictability. Strong focus on team building activities to foster collaboration, trust, and high-performing teams. Led digital transformation programs by assessing current state services, identifying future opportunities, and enabling efficient, scalable solutions. Experienced in delivering training, hosting large-scale workshops, and leveraging AI tools to enhance sprint execution, backlog management, and team collaboration.
+
+
+EXPERIENCE
+
+TECHNICAL PROGRAM MANAGER OR SENIOR AGILE SCRUM MASTER | LULULEMON | AUGUST 2023 - PRESENT
+
+Lead end‑to‑end program management for enterprise data and analytics initiatives, overseeing multiple workstreams and ensuring alignment with program scope, timelines, milestones, and deliverables.
+Define and execute strategic program roadmaps for Snowflake and Power BI adoption, supporting system implementation, integration, and transition planning.
+Establish and scale Center of Excellence (CoE) and Community of Practice (CoP) frameworks to standardize governance, best practices, and platform adoption..
+Manage cross‑functional delivery across 7 international teams, facilitating collaboration across business leaders, technical teams, external partners, and vendors.
+Own resource planning, intake, prioritization, backlog management, and roadmap tracking to improve transparency and accountability.
+Manage risks, issues, and dependencies, implementing mitigation and escalation strategies.
+Apply Agile, hybrid, or traditional delivery methodologies based on program complexity.
+Track KPIs to monitor program performance and enable timely reporting and course correction.
+Collaborated with vendors (Snowflake, Microsoft PowerBI) to define scope, track deliverables, and ensure alignment on timelines, budget, and outcomes.
+Manage program financials (~$2M), including budget management, forecasting, and financial tracking.
+Own governance, release management, deployment coordination, and alignment across dependent initiatives.
+Promote continuous improvement by capturing lessons learned and refining delivery approaches.
+Lead Agile program delivery by facilitating sprint ceremonies and coaching teams on Scrum best practices, improving team velocity by ~50%.
+
+Lead Agile delivery for cross-functional program and product delivery teams, ensuring consistent execution of sprint commitments and delivery of product features.
+Coach and mentor teams on Agile principles, policies, and procedures, enabling self-organization, improved sprint commitments, and continuous improvement.
+Facilitate key Agile ceremonies including sprint planning, daily stand-ups, backlog refinement, sprint reviews, retrospectives, and product demos.
+Drive backlog definition and backlog management in alignment with product owner priorities, ensuring clear user stories, acceptance criteria, and sprint readiness.
+Act as an intermediary between product owners and development teams, ensuring alignment on priorities, dependencies, and delivery timelines.
+Identify and remove blockers and distractions impacting sprint commitments, proactively managing risks and dependencies across 7+ teams including POS, Omnichannel teams..
+Established and scaled Center of Excellence (CoE) and Community of Practice (CoP), delivering training and hosting workshops for 200–300+ developers to support Agile adoption and platform transition.
+Lead digital transformation initiatives by modernizing data platforms (Snowflake, Power BI), improving efficiency, governance, and service delivery.
+Maintain delivery metrics and artifacts including sprint burndown charts, velocity tracking, product backlogs, and sprint backlogs to ensure transparency and reporting.
+Facilitate cross-functional program review sessions and dependency forums to align teams and improve delivery predictability.
+Deliver training sessions via web-based tools (MS Teams), coaching teams on Agile methodologies, estimation techniques, and sprint planning best practices.
+Leverage AI tools (Microsoft Copilot) to support sprint documentation, meeting summaries, backlog analysis, and team collaboration.
+
+
+TECHNICAL PROGRAM MANAGER / PROGRAM SCRUM MANAGER | MENLO SECURITY | MAY 2022 - AUGUST 2023
+
+Led program delivery across 4 infrastructure teams, managing multi‑stream programs with integrated timelines, milestones, and resource allocation.
+Managed  an annual program budget of $8M, achieving 5% savings through optimized budget allocation.
+Implemented Agile, hybrid, and Nexus frameworks to suit program complexity and organizational needs.
+Coordinated system implementation, integration, and transition planning through structured operational processes.
+Reduced incident response time by ~40% through improved risk management, issue management, and escalation practices.
+Developed integrated program plans, roadmaps, and OKRs aligned with organizational objectives.
+Oversaw vendor relationships, contracts, and deliverables to ensure adherence to scope, timelines, and quality standards.
+Strengthened governance, documentation, and reporting structures for transparency and accountability.
+Drove continuous improvement through operational standardization and lessons learned
+
+Led Agile transformation across infrastructure and platform teams, implementing Scrum and Nexus frameworks to improve delivery efficiency.
+Facilitated Agile ceremonies sprint planning, stand-ups, retrospectives, and backlog refinement sessions.
+Coached teams on Agile methodologies, improving sprint commitments, estimation accuracy, and delivery predictability.
+Managed backlog prioritization and planning in alignment with product and business stakeholders.
+Identified and removed blockers impacting sprint delivery, improving team velocity and operational efficiency.
+Established incident management and triage processes, improving response time by ~40% and ensuring service reliability.
+Maintained delivery metrics, sprint tracking, and reporting for stakeholders using Jira and reporting tools.
+Collaborated with cross-functional teams to ensure alignment on deliverables, timelines, and dependencies.
+Coached teams on effective effort estimation, story sizing, and sprint commitments, enabling better planning accuracy and improved delivery predictability across multiple teams.
+Coached teams on estimation techniques, sprint planning, and adjusting for external dependencies, improving sprint predictability and delivery outcomes.
+
+
+
+AGILE TECHNICAL PROJECT MANAGER | KORE SOFTWARE | MAY 2021 - APRIL 2022
+
+Led adoption of Agile, hybrid, and Waterfall delivery models across portfolios, managing integrated program plans and multiple workstreams.
+Ensured alignment with organizational objectives through structured program roadmaps, timelines, and milestones.
+Improved cross‑functional collaboration and stakeholder engagement across engineering, product, and operations.
+Managed resource planning, roadmap execution, and engineering operations.
+Reported on risks, issues, dependencies, and mitigation plans, strengthening governance and transparency.
+Applied change management practices to support transition planning and adoption.
+Drove continuous improvement through process optimization and lessons learned.
+
+Led Agile adoption and transformation initiatives, increasing Scrum adoption by ~60% across teams.
+Facilitated all Scrum ceremonies and ensured adherence to Agile principles and delivery processes.
+Managed backlog planning, sprint execution, and roadmap alignment with product owner priorities.
+Coached teams on Agile best practices, estimation, and sprint commitments to improve delivery outcomes.
+Streamlined workflows and support processes, reducing turnaround time from 2 months to 1 week.
+Delivered status reports, progress updates, and risk mitigation plans to stakeholders.
+Applied change management (ADKAR) to drive Agile adoption and continuous improvement.
+
+
+SENIOR SCRUM MASTER | ONESPAN INC. | OCTOBER 2019 - APRIL 2021
+
+Led implementation of cloud‑native solutions supporting enterprise system implementation, integration, and modernization.
+Collaborated with Product and Engineering to ensure stakeholder engagement and alignment across multiple stakeholder groups.
+Led capacity and roadmap planning, supporting resource planning and prioritization.
+Developed business cases to support decision‑making and program prioritization.
+Scaled Scrum using Nexus to address dependencies and cross‑team coordination.
+Maintained Jira and PowerBI dashboards for KPIs, reporting, and performance tracking.
+Managed distributed teams, ensuring consistent delivery across multiple workstreams.
+
+Led Agile delivery across multiple cross-functional teams for a risk analytics platform using Scrum and Nexus frameworks.
+Facilitated sprint ceremonies including planning, stand-ups, reviews, retrospectives, and backlog refinement.
+Managed backlog definition, prioritization, and story sizing in collaboration with product owners to ensure accurate estimation and sprint readiness.
+Coordinated end-to-end delivery (requirements → design → build → test → deployment) ensuring alignment with sprint goals.
+Identified and removed blockers, managed dependencies, and ensured timely delivery of product features.
+Facilitated workshops (up to 40 participants) to define requirements, support team formation, and align on delivery approach.
+Maintained delivery metrics including velocity, burndown charts, and sprint performance tracking.
+Supported teams working with UX and product teams, aligning delivery with user needs and business goals.
+
+
+SAFe SCRUM MASTER | OCEANWIDE INC | OCTOBER 2016 - OCTOBER 2019
+
+Managed 5 development teams across multi‑stream programs, coordinating with 20+ clients and stakeholders.
+Acted as Release Train Manager, coordinating dependent initiatives, timelines, and milestones across the organization.
+Implemented SAFe practices to strengthen governance, predictability, and alignment.
+Ensured documentation of program artifacts, including program roadmaps, release plans, and risk management plans.
+Led transition to Azure DevOps, improving reporting structures and transparency.
+Strengthened stakeholder engagement across engineering and product teams.
+
+Managed Agile delivery across 5 cross-functional teams using SAFe framework.
+Facilitated Program Increment (PI) planning, sprint ceremonies, retrospectives, and product demos.
+Coached teams on Agile principles and SAFe practices to improve delivery consistency and quality.
+Managed backlog planning, sprint commitments, and alignment with product owner priorities.
+Identified risks, dependencies, and blockers, ensuring timely resolution and delivery.
+Maintained Agile artifacts and reporting metrics to provide transparency to stakeholders.
+Supported continuous improvement initiatives across teams and programs.
+
+
+SOFTWARE DEVELOPER | VISUAL-2000 | NOVEMBER 2015 - SEPTEMBER 2016
+Developed and delivered web-based applications, including order management and notification systems.
+Built responsive UI components and integrated front-end with backend systems.
+Designed and optimized MySQL database solutions for performance and scalability.
+Implemented Agile/Kanban workflows using Jira, improving team visibility and delivery tracking.
+Contributed to key modules such as cart management and dashboards, enhancing product functionality.
+Introduced Agile practices, improving backlog management and development workflows.
+
+FRONT END DEVELOPER INTERN | TANDEM LAUNCH | JUNE 2015 - OCTOBER 2015
+Developed cross-platform mobile application integrating Bluetooth-based sensor data processing.
+Built UI/UX components for intuitive user interaction with hardware-integrated systems.
+Worked with Python and Java for signal processing and sensor integration.
+Collaborated with cross-functional teams on ML-driven sensing and application features.
+
+
+EDUCATION
+MASTER OF ENGINEERING |SOFTWARE ENGINEERING | CONCORDIA UNIVERSITY | 2013 - 2015
+BACHELOR OF ENGINEERING | COMPUTER SCIENCE ENGINEERING |JNTU | 2009 - 2013
+
+SKILLS
+Program & Partnership Management: Partner Implementations, Program Maturity, Operational Efficiency, Cross‑Functional Alignment, Risk Management, Roadmaps, Success Metrics
+Technical & Analytical: Quantitative Analysis, Reporting Dashboards, Data Platforms, CI/CD, DevOps, Cloud Applications
+Methodologies & Tools: Agile, SAFe, Nexus, Waterfall, Jira, Azure DevOps, Power BI, PagerDuty
+Communication: Partner Communication, Executive Reporting, Cross‑Team Facilitation, Presentations
+
+CERTIFICATIONS
+Certified Scrum Master (CSM)
+ProSci Change Practitioner
+Cognitive Project Management in AI (CPMAI) – PMI Group
+
+

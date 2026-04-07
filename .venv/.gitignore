@@ -1,0 +1,9 @@
+# created by virtualenv automatically
+.venv/
+__pycache__/
+*.pyc
+.env
+resume.txt
+uploads/
+*.docx
+.DS_Store
