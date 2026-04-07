@@ -165,6 +165,38 @@ def parse_json(text):
         clean = clean[start:end]
     return json.loads(clean)
 
+def _salary_meets_minimum(salary_str):
+    """Return True if the salary string indicates >= $75/hr or >= $180,000/year.
+    Returns True (pass-through) when the salary cannot be parsed."""
+    import re
+    s = salary_str.lower().replace(",", "").replace("$", "").replace("cad", "").strip()
+
+    # Extract all numbers from the string
+    numbers = [float(n) for n in re.findall(r"\d+(?:\.\d+)?", s)]
+    if not numbers:
+        return True  # unparseable — let it through
+
+    # Determine if hourly or annual
+    is_hourly = any(word in s for word in ["hour", "hr", "/h", "per h"])
+    is_annual = any(word in s for word in ["year", "yr", "annual", "salary", "k"])
+
+    # Handle shorthand like "180k" or "200k"
+    if "k" in s:
+        numbers = [n * 1000 if n < 10000 else n for n in numbers]
+
+    max_val = max(numbers)
+
+    if is_hourly:
+        return max_val >= 75
+    if is_annual:
+        return max_val >= 180000
+
+    # Ambiguous — use magnitude to guess
+    if max_val >= 1000:
+        return max_val >= 180000  # treat as annual
+    return max_val >= 75  # treat as hourly
+
+
 def find_jobs_only(criteria):
     system_prompt = """You are a job search specialist searching LinkedIn for jobs in Canada.
 
@@ -178,7 +210,9 @@ Important rules:
 - Only include results from linkedin.com
 - Only include Scrum Master or Project Manager roles
 - Only include jobs in Canada
+- Only include jobs that are ACTIVE and currently accepting applications — skip closed, expired, or filled postings
 - If salary is not mentioned that is okay — still include the job
+- If salary IS mentioned, only include jobs paying at least $75/hour or $180,000 annually
 
 PRIORITIZATION — sort jobs by how recently they were posted:
 - Today or posted X hours ago = highest priority
@@ -202,6 +236,7 @@ Return whatever you find — even if only 1 or 2 jobs. Return ONLY this JSON:
             "description": "One sentence about the role",
             "posted_date": "e.g. 2 hours ago / 1 day ago / 3 days ago",
             "posted_priority": 1,
+            "is_active": true,
             "source": "linkedin"
         }
     ],
@@ -259,6 +294,15 @@ If absolutely no jobs are found return:
                 continue
             if not any(t in title for t in allowed_titles):
                 print(f"Filtered — wrong role: {job.get('title')}")
+                continue
+
+            if not job.get("is_active", True):
+                print(f"Filtered — not active/accepting applications: {job.get('title')} — {job.get('company')}")
+                continue
+
+            salary_raw = job.get("salary", "").strip()
+            if salary_raw and not _salary_meets_minimum(salary_raw):
+                print(f"Filtered — salary below minimum: {job.get('title')} — {salary_raw}")
                 continue
 
             filtered_jobs.append(job)
@@ -573,7 +617,8 @@ def run_daily_job_search():
 LinkedIn ONLY. Canada ONLY.
 Roles: Scrum Master, Project Manager
 Location: Remote Canada or Hybrid Vancouver BC
-Salary preference: $75/hour or $180,000 annual — include job even if salary not listed
+Active postings ONLY — must be currently accepting applications (not closed, expired, or filled)
+Salary requirement: minimum $75/hour or $180,000 annual — skip if salary is listed below this threshold; include if salary is not listed
 Prioritize: newest postings first
 """
     try:
