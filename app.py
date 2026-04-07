@@ -15,8 +15,10 @@ from email import encoders
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from docx import Document
-from docx.shared import Pt, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, RGBColor, Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
 import io
 
 load_dotenv()
@@ -336,10 +338,22 @@ Be concise. Return ONLY valid JSON — no other text:
     "match_summary": "One sentence why this is a good match",
     "key_requirements": ["req 1", "req 2", "req 3"],
     "missing_skills": ["skill 1"],
-    "tailored_resume": "Full tailored resume",
+    "tailored_resume": "Full tailored resume — see format rules below",
     "cover_letter": "Short focused cover letter",
     "keywords_added": ["keyword 1", "keyword 2"]
-}"""
+}
+
+tailored_resume MUST follow this exact plain-text structure:
+Line 1: Candidate full name (e.g. AKHILESH SATTENAPALLI)
+Line 2: Title | Certifications (e.g. Technical Program Manager | PMP | Harvard Business School Certified)
+Line 3: Location | email | LinkedIn | phone
+(blank line)
+Then sections using these rules:
+- Section headers in ALL CAPS on their own line (e.g. EXECUTIVE PROFILE, SELECTED CAREER HIGHLIGHTS, PROFESSIONAL LEADERSHIP HISTORY, CERTIFICATIONS, EDUCATION)
+- Job entries on ONE line: Title | Company | City  Month Year – Month Year  (date at end separated by two spaces)
+- Bullet points starting with • (one bullet per line)
+- Use **bold text** around key phrases in paragraph sections
+- Keep original sections and ordering from the source resume"""
 
     user_message = f"""Job: {job.get('title')} at {job.get('company')}
 Location: {job.get('location')}
@@ -439,49 +453,184 @@ Return ONLY valid JSON — no other text:
         }
 
 def create_resume_doc(job, resume_text):
+    import re
+
     doc = Document()
-    style = doc.styles['Normal']
-    style.font.name = 'Calibri'
-    style.font.size = Pt(11)
 
-    header = doc.add_paragraph()
-    header.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = header.add_run(f"Resume — {job.get('title')} at {job.get('company')}")
-    run.bold = True
-    run.font.size = Pt(14)
-    run.font.color.rgb = RGBColor(0x3b, 0x5b, 0xdb)
+    # Page margins
+    sec = doc.sections[0]
+    sec.top_margin = Inches(0.75)
+    sec.bottom_margin = Inches(0.75)
+    sec.left_margin = Inches(1.0)
+    sec.right_margin = Inches(1.0)
 
-    meta = doc.add_paragraph()
-    meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    meta_run = meta.add_run(f"Applied for: {job.get('title')} | {job.get('company')} | {job.get('location')}")
-    meta_run.font.size = Pt(10)
-    meta_run.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+    # Base font
+    normal = doc.styles['Normal']
+    normal.font.name = 'Calibri'
+    normal.font.size = Pt(11)
+    normal.paragraph_format.space_after = Pt(0)
+    normal.paragraph_format.space_before = Pt(0)
 
-    posted = doc.add_paragraph()
-    posted.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    posted_run = posted.add_run(f"Job posted: {job.get('posted_date', 'Recently')}")
-    posted_run.font.size = Pt(10)
-    posted_run.font.color.rgb = RGBColor(0x16, 0xa3, 0x4a)
+    def _hr():
+        """Thin horizontal rule as a paragraph bottom border."""
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(6)
+        p.paragraph_format.space_after = Pt(6)
+        pPr = p._p.get_or_add_pPr()
+        pBdr = OxmlElement('w:pBdr')
+        bottom = OxmlElement('w:bottom')
+        bottom.set(qn('w:val'), 'single')
+        bottom.set(qn('w:sz'), '6')
+        bottom.set(qn('w:space'), '1')
+        bottom.set(qn('w:color'), '000000')
+        pBdr.append(bottom)
+        pPr.append(pBdr)
 
-    doc.add_paragraph()
+    def _section_header(text):
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(4)
+        p.paragraph_format.space_after = Pt(6)
+        run = p.add_run(text.upper())
+        run.bold = True
+        run.font.size = Pt(11)
+        run.font.name = 'Calibri'
+        run.font.color.rgb = RGBColor(0, 0, 0)
 
-    for line in resume_text.split('\n'):
-        line = line.strip()
+    def _job_header(title_part, date_str):
+        """Bold title left-aligned, italic date right-aligned via tab stop."""
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(6)
+        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.tab_stops.add_tab_stop(Inches(6.5), WD_TAB_ALIGNMENT.RIGHT)
+        r1 = p.add_run(title_part)
+        r1.bold = True
+        r1.font.name = 'Calibri'
+        r1.font.size = Pt(11)
+        if date_str:
+            p.add_run('\t')
+            r2 = p.add_run(date_str)
+            r2.italic = True
+            r2.font.name = 'Calibri'
+            r2.font.size = Pt(11)
+
+    def _bullet(text):
+        p = doc.add_paragraph(style='List Bullet')
+        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.space_before = Pt(0)
+        run = p.add_run(text)
+        run.font.name = 'Calibri'
+        run.font.size = Pt(11)
+
+    def _body_paragraph(text):
+        """Justified paragraph with **bold** inline support."""
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.paragraph_format.space_after = Pt(4)
+        parts = re.split(r'\*\*(.*?)\*\*', text)
+        for idx, part in enumerate(parts):
+            run = p.add_run(part)
+            run.font.name = 'Calibri'
+            run.font.size = Pt(11)
+            if idx % 2 == 1:
+                run.bold = True
+
+    # Regex: detects a date range at the end of a job entry line
+    DATE_RE = re.compile(
+        r'((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|'
+        r'Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}'
+        r'\s*[–\-]\s*'
+        r'(?:Present|\d{4}|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|'
+        r'Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|'
+        r'Dec(?:ember)?)\s+\d{4}))'
+    )
+
+    # ── Header block: first 3 non-empty lines = name / title+creds / contact ──
+    lines = [ln.strip() for ln in resume_text.split('\n')]
+    header_lines = []
+    body_start = 0
+    for idx, ln in enumerate(lines):
+        if ln:
+            header_lines.append(ln)
+            if len(header_lines) == 3:
+                body_start = idx + 1
+                break
+
+    # Name — large bold
+    if len(header_lines) > 0:
+        p = doc.add_paragraph()
+        p.paragraph_format.space_after = Pt(2)
+        run = p.add_run(header_lines[0])
+        run.bold = True
+        run.font.name = 'Calibri'
+        run.font.size = Pt(18)
+
+    # Title / credentials — bold
+    if len(header_lines) > 1:
+        p = doc.add_paragraph()
+        p.paragraph_format.space_after = Pt(2)
+        run = p.add_run(header_lines[1])
+        run.bold = True
+        run.font.name = 'Calibri'
+        run.font.size = Pt(11)
+
+    # Contact line — normal
+    if len(header_lines) > 2:
+        p = doc.add_paragraph()
+        p.paragraph_format.space_after = Pt(4)
+        run = p.add_run(header_lines[2])
+        run.font.name = 'Calibri'
+        run.font.size = Pt(11)
+
+    _hr()
+
+    # ── Body ──
+    EXPERIENCE_KEYWORDS = {'HISTORY', 'EXPERIENCE', 'EMPLOYMENT', 'CAREER'}
+    first_section = True
+    in_experience = False
+    first_job_in_section = True
+
+    i = body_start
+    while i < len(lines):
+        line = lines[i]
+        i += 1
+
         if not line:
-            doc.add_paragraph()
             continue
-        if line.isupper() and len(line) < 50:
-            p = doc.add_paragraph()
-            run = p.add_run(line)
-            run.bold = True
-            run.font.size = Pt(12)
-            run.font.color.rgb = RGBColor(0x3b, 0x5b, 0xdb)
-            p.paragraph_format.space_before = Pt(6)
-        elif line.startswith('•') or line.startswith('-'):
-            p = doc.add_paragraph(style='List Bullet')
-            p.add_run(line.lstrip('•- '))
-        else:
-            doc.add_paragraph(line)
+
+        # Section header: short ALL-CAPS line with at least one letter, no bullet prefix
+        is_section = (
+            line.upper() == line
+            and len(line) < 65
+            and any(c.isalpha() for c in line)
+            and not line[0] in ('•', '-', '*')
+        )
+        if is_section:
+            if not first_section:
+                _hr()
+            _section_header(line)
+            first_section = False
+            in_experience = bool(EXPERIENCE_KEYWORDS & set(line.upper().split()))
+            first_job_in_section = True
+            continue
+
+        # Bullet point
+        if line[0] in ('•', '-', '*'):
+            _bullet(line.lstrip('•-* '))
+            continue
+
+        # Job entry header (contains a date range)
+        m = DATE_RE.search(line)
+        if m:
+            if in_experience and not first_job_in_section:
+                _hr()
+            date_str = m.group(1)
+            title_part = line[:m.start()].strip().rstrip('–- ').strip()
+            _job_header(title_part, date_str)
+            first_job_in_section = False
+            continue
+
+        # Regular body paragraph
+        _body_paragraph(line)
 
     buf = io.BytesIO()
     doc.save(buf)
@@ -489,35 +638,66 @@ def create_resume_doc(job, resume_text):
     return buf.read()
 
 def create_cover_letter_doc(job, cover_text):
+    import re
+
     doc = Document()
-    style = doc.styles['Normal']
-    style.font.name = 'Calibri'
-    style.font.size = Pt(11)
 
-    date_p = doc.add_paragraph()
-    date_p.add_run(datetime.now().strftime('%B %d, %Y'))
+    sec = doc.sections[0]
+    sec.top_margin = Inches(0.75)
+    sec.bottom_margin = Inches(0.75)
+    sec.left_margin = Inches(1.0)
+    sec.right_margin = Inches(1.0)
 
-    doc.add_paragraph()
+    normal = doc.styles['Normal']
+    normal.font.name = 'Calibri'
+    normal.font.size = Pt(11)
+    normal.paragraph_format.space_after = Pt(0)
+    normal.paragraph_format.space_before = Pt(0)
 
-    header = doc.add_paragraph()
-    run = header.add_run(f"Re: {job.get('title')} — {job.get('company')}")
+    # Date
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(12)
+    p.add_run(datetime.now().strftime('%B %d, %Y')).font.size = Pt(11)
+
+    # RE line
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(2)
+    run = p.add_run(f"Re: {job.get('title')} — {job.get('company')}")
     run.bold = True
-    run.font.size = Pt(12)
-    run.font.color.rgb = RGBColor(0x3b, 0x5b, 0xdb)
+    run.font.name = 'Calibri'
+    run.font.size = Pt(11)
 
-    posted = doc.add_paragraph()
-    posted_run = posted.add_run(f"Job posted: {job.get('posted_date', 'Recently')} | {job.get('location', '')}")
-    posted_run.font.size = Pt(10)
-    posted_run.font.color.rgb = RGBColor(0x16, 0xa3, 0x4a)
+    # Divider
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(4)
+    p.paragraph_format.space_after = Pt(10)
+    pPr = p._p.get_or_add_pPr()
+    pBdr = OxmlElement('w:pBdr')
+    bottom = OxmlElement('w:bottom')
+    bottom.set(qn('w:val'), 'single')
+    bottom.set(qn('w:sz'), '6')
+    bottom.set(qn('w:space'), '1')
+    bottom.set(qn('w:color'), '000000')
+    pBdr.append(bottom)
+    pPr.append(pBdr)
 
-    doc.add_paragraph()
-
+    # Body
     for line in cover_text.split('\n'):
         line = line.strip()
         if not line:
-            doc.add_paragraph()
+            p = doc.add_paragraph()
+            p.paragraph_format.space_after = Pt(0)
             continue
-        doc.add_paragraph(line)
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.paragraph_format.space_after = Pt(8)
+        parts = re.split(r'\*\*(.*?)\*\*', line)
+        for idx, part in enumerate(parts):
+            run = p.add_run(part)
+            run.font.name = 'Calibri'
+            run.font.size = Pt(11)
+            if idx % 2 == 1:
+                run.bold = True
 
     buf = io.BytesIO()
     doc.save(buf)
