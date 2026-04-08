@@ -167,6 +167,87 @@ The app runs locally by default. To run 24/7, deploy to Railway or Render:
 
 **Resume privacy:** `resume.txt` is excluded from git via `.gitignore`. Never commit personal information to a public repo.
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Two Entry Points                   │
+│                                                     │
+│  Web UI (Flask)          Scheduler (APScheduler)    │
+│  localhost:5000          8AM + 1PM daily            │
+└────────────┬─────────────────────┬──────────────────┘
+             │                     │
+             ▼                     ▼
+┌─────────────────────────────────────────────────────┐
+│          find_and_tailor_jobs(criteria)              │
+│               Orchestrator function                  │
+└────────────┬────────────────────────────────────────┘
+             │
+      ┌──────┴──────┐
+      ▼             ▼
+┌──────────┐   ┌─────────────────────────────────────┐
+│ Step 1   │   │         find_jobs_only()             │
+│ Search   │   │                                     │
+│          │   │  Claude Haiku + Serper (web search)  │
+│          │   │  → Google search LinkedIn jobs       │
+│          │   │  → Parse JSON response               │
+│          │   │  → Apply hard filters:               │
+│          │   │    • LinkedIn URLs only              │
+│          │   │    • Canada only                     │
+│          │   │    • Scrum Master / PM titles only   │
+│          │   │    • Active postings only            │
+│          │   │    • Salary ≥ $75/hr or $180k/yr     │
+│          │   │  → Sort by recency                   │
+└──────────┘   └──────────────────┬──────────────────┘
+                                  │ filtered jobs[]
+                                  ▼
+┌─────────────────────────────────────────────────────┐
+│ Step 2   tailor_for_job() — per job (loop)          │
+│                                                     │
+│  Claude Sonnet + resume.txt                         │
+│  → Match score (0–100)                              │
+│  → Key requirements                                 │
+│  → Missing skills                                   │
+│  → Tailored resume text                             │
+│  → Cover letter text                                │
+└────────────┬────────────────────────────────────────┘
+             │
+      ┌──────┴──────┐
+      ▼             ▼
+┌──────────┐   ┌──────────────────────────────────────┐
+│ Web UI   │   │  Email delivery                      │
+│ renders  │   │                                      │
+│ results  │   │  create_resume_doc()  → .docx        │
+│ in       │   │  create_cover_letter_doc() → .docx   │
+│ browser  │   │  send_email() via Gmail SMTP         │
+└──────────┘   └──────────────────────────────────────┘
+```
+
+### Key design decisions
+
+| Decision | What & Why |
+|---|---|
+| **Two Claude models** | Haiku for job search (cheap, fast), Sonnet for resume writing (higher quality) |
+| **Serper API as tool** | Claude calls web search as a tool — more flexible than hardcoded scraping |
+| **Hard Python filters** | Business rules (salary, active, Canada, role) enforced in Python, not just Claude prompts |
+| **Plain text resume** | `resume.txt` as master source — Claude tailors it per job on every run |
+| **Stateless** | No database — each run is independent, results emailed or shown in UI |
+| **APScheduler** | Lightweight in-process scheduler, no separate worker process needed |
+
+### Data flow summary
+
+```
+resume.txt + criteria
+       ↓
+  Claude (Haiku) + Serper → raw job list
+       ↓
+  Python filters → clean job list
+       ↓
+  Claude (Sonnet) × N jobs → tailored content
+       ↓
+  python-docx → .docx files → Gmail SMTP → inbox
+```
+
 ---
 
 Built by Akhilesh Sattenapalli — PM turned AI engineer.
